@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ game.name }} - ARCDVN STORE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .card-radio:checked + .card-content { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body class="pb-20">
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="text-2xl font-extrabold tracking-tighter text-blue-500">ARCDVN<span class="text-white">STORE</span></div>
+        <a href="/" class="text-gray-400 hover:text-white transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</a>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4">
+            <div class="glass p-6 rounded-3xl sticky top-8">
+                <img src="{{ game.icon.url }}" class="w-32 h-32 rounded-3xl shadow-2xl mb-6 mx-auto lg:mx-0 object-cover border-2 border-blue-500/30">
+                <h1 class="text-3xl font-800 mb-2">{{ game.name }}</h1>
+                <div class="space-y-4 text-gray-400 text-sm leading-relaxed">
+                    <p><i class="fas fa-bolt text-yellow-500 mr-2"></i> Proses Instan 1-3 Menit</p>
+                    <p><i class="fas fa-shield-alt text-green-500 mr-2"></i> Pembayaran Aman & Terpercaya</p>
+                    <p><i class="fas fa-headset text-blue-500 mr-2"></i> Layanan CS 24/7</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="glass p-8 rounded-3xl">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
+                        <h2 class="text-xl font-bold">Lengkapi Data Akun</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">User ID</label>
+                            <input type="text" name="player_id" required placeholder="Masukkan ID" 
+                                   class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Zone ID (Opsional)</label>
+                            <input type="text" name="zone_id" placeholder="Masukkan Server" 
+                                   class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-3xl">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
+                        <h2 class="text-xl font-bold">Pilih Nominal Top Up</h2>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {% for p in products %}
+                        <label class="relative group cursor-pointer">
+                            <input type="radio" name="product" value="{{ p.id }}" class="card-radio hidden" required>
+                            <div class="card-content border-2 border-slate-700 bg-slate-900/40 p-5 rounded-2xl transition-all hover:border-blue-500/50">
+                                <p class="text-xs text-gray-400 uppercase font-bold mb-1">{{ game.name }}</p>
+                                <p class="font-bold text-lg mb-2">{{ p.name }}</p>
+                                <p class="text-blue-400 font-extrabold text-sm">Rp {{ p.price }}</p>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-3xl">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
+                        <h2 class="text-xl font-bold">Nomor WhatsApp</h2>
+                    </div>
+                    <input type="number" name="whatsapp" required placeholder="0812xxxx" 
+                           class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl mb-6">
+                    
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/20 transform active:scale-95 transition-all">
+                        BELI SEKARANG <i class="fas fa-shopping-cart ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

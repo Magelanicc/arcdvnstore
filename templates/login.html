@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCDVN | Login Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0f172a] flex items-center justify-center h-screen">
+    <div class="bg-[#1e293b] p-10 rounded-3xl shadow-2xl border border-gray-700 w-full max-w-md">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-blue-500">ARCDVN<span class="text-white">STORE</span></h1>
+            <p class="text-gray-400 mt-2">Silakan login untuk masuk ke Admin Panel.</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Username</label>
+                    <input type="text" name="username" class="w-full bg-[#0f172a] border border-gray-700 rounded-xl p-3 text-white focus:border-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+                    <input type="password" name="password" class="w-full bg-[#0f172a] border border-gray-700 rounded-xl p-3 text-white focus:border-blue-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-900/20">
+                    Masuk Sekarang
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
