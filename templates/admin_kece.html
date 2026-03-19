@@ -4,152 +4,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCDVN Admin - Dashboard</title>
+    <title>Dashboard - ARCDVN Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        input, select { color: white !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; padding: 0.75rem !important; border-radius: 0.75rem !important; width: 100%; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: #9ca3af; }
         .sidebar-item:hover { background: rgba(255,255,255,0.1); transition: 0.3s; }
+        .chart-container { position: relative; height: 350px; width: 100%; }
     </style>
 </head>
-<body class="text-gray-100">
+<body class="text-gray-100 flex h-screen overflow-hidden">
 
-    <div class="flex h-screen overflow-hidden">
-        <aside class="w-64 bg-gray-800 border-r border-gray-700 hidden md:flex flex-col p-6">
-            <div class="text-2xl font-bold tracking-widest text-blue-500 mb-10">ARCDVN<span class="text-white">STORE</span></div>
-            <nav class="space-y-2">
-                <a href="{% url 'admin-dashboard' %}" class="flex items-center p-3 rounded-lg bg-blue-600 text-white"><i class="fas fa-home mr-3"></i> Dashboard</a>
-                <a href="#" class="flex items-center p-3 sidebar-item rounded-lg text-gray-400"><i class="fas fa-gamepad mr-3"></i> Management Games</a>
-                <a href="#" class="flex items-center p-3 sidebar-item rounded-lg text-gray-400"><i class="fas fa-exchange-alt mr-3"></i> Transaksi</a>
-                <a href="{% url 'logout-admin' %}" class="flex items-center p-3 mt-10 rounded-lg text-red-500 hover:bg-red-900/20 font-bold"><i class="fas fa-sign-out-alt mr-3"></i> Keluar</a>
-            </nav>
-        </aside>
+    <aside class="w-64 bg-gray-800 border-r border-gray-700 hidden md:flex flex-col p-6">
+        <div class="text-2xl font-bold tracking-widest text-blue-500 mb-10">ARCDVN<span class="text-white">STORE</span></div>
+        <nav class="space-y-2">
+            <a href="{% url 'admin-dashboard' %}" class="flex items-center p-3 rounded-lg bg-blue-600 text-white"><i class="fas fa-home mr-3"></i> Dashboard</a>
+            <a href="{% url 'admin-games' %}" class="flex items-center p-3 sidebar-item rounded-lg text-gray-400"><i class="fas fa-gamepad mr-3"></i> Management Games</a>
+            <a href="{% url 'admin-transactions' %}" class="flex items-center p-3 sidebar-item rounded-lg text-gray-400"><i class="fas fa-exchange-alt mr-3"></i> Transaksi</a>
+            <a href="{% url 'logout-admin' %}" class="flex items-center p-3 mt-10 rounded-lg text-red-500 hover:bg-red-900/20 font-bold"><i class="fas fa-sign-out-alt mr-3"></i> Keluar</a>
+        </nav>
+    </aside>
 
-        <main class="flex-1 overflow-y-auto p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold">Ringkasan Store</h1>
-                <div class="bg-gray-800 px-4 py-2 rounded-full border border-gray-700"><i class="fas fa-user-circle mr-2"></i> Admin Andy</div>
+    <main class="flex-1 overflow-y-auto p-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Dashboard Overview</h1>
+        <div class="bg-gray-800 px-4 py-2 rounded-full border border-gray-700 text-sm">
+            <span class="w-2 h-2 bg-green-500 inline-block rounded-full mr-2 animate-pulse"></span> Live Monitoring
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        </div>
+
+    <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700 shadow-lg mb-8">
+        <h3 class="text-lg font-bold mb-4">Tren Penjualan (7 Hari)</h3>
+        <div class="h-[300px]">
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700 shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold">Transaksi Terbaru</h3>
+                <a href="{% url 'admin-transactions' %}" class="text-xs text-blue-400 hover:underline">Lihat Semua</a>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <p class="text-gray-400">Total Transaksi</p>
-                    <h2 class="text-4xl font-bold mt-2">{{ total_transaksi }}</h2>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 text-blue-400">
-                    <p class="text-gray-400">Revenue</p>
-                    <h2 class="text-4xl font-bold mt-2">Rp {{ totalRevenue }}</h2>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <p class="text-gray-400">Game Aktif</p>
-                    <h2 class="text-4xl font-bold mt-2">{{ games.count }}</h2>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <h3 class="text-xl font-bold mb-4 text-blue-500">Tambah Game</h3>
-                    <form method="POST" enctype="multipart/form-data">{% csrf_token %}{{ game_form.as_p }}
-                        <button type="submit" name="add_game" class="w-full bg-blue-600 p-3 rounded-xl font-bold mt-4 hover:bg-blue-500">Simpan Game</button>
-                    </form>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <h3 class="text-xl font-bold mb-4 text-green-500">Tambah Harga</h3>
-                    <form method="POST">{% csrf_token %}{{ product_form.as_p }}
-                        <button type="submit" name="add_product" class="w-full bg-green-600 p-3 rounded-xl font-bold mt-4 hover:bg-green-500">Simpan Harga</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 mb-8">
-                <h3 class="text-xl font-bold mb-4 text-orange-500">Manage Games</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {% for game in games %}
-                    <div class="flex items-center justify-between bg-gray-900 p-4 rounded-xl border border-gray-700">
-                        <div class="flex items-center space-x-4">
-                            {% if game.icon %}
-                                <img src="{{ game.icon.url }}" alt="{{ game.name }}" class="w-12 h-12 object-cover rounded-lg border border-gray-600">
-                            {% else %}
-                                <div class="w-12 h-12 rounded-lg bg-gray-700 flex items-center justify-center border border-gray-600"><i class="fas fa-gamepad text-gray-400"></i></div>
-                            {% endif %}
-                            <span class="font-semibold">{{ game.name }}</span>
+            <div class="space-y-4">
+                {% for tx in recent_transactions %}
+                <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-2xl border border-gray-700/50">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 mr-4">
+                            <i class="fas fa-receipt"></i>
                         </div>
-                        <button onclick="confirmDelete('{{ game.id }}', '{{ game.name }}')" class="text-red-500 hover:text-red-400 bg-red-900/20 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
+                        <div>
+                            <p class="text-sm font-bold">{{ tx.game.name }}</p>
+                            <p class="text-[10px] text-gray-500">{{ tx.created_at|date:"d M, H:i" }}</p>
+                        </div>
                     </div>
-                    {% empty %}
-                    <p class="text-gray-500">Belum ada game yang terdaftar.</p>
-                    {% endfor %}
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-white">Rp {{ tx.total_price }}</p>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full {% if tx.status == 'SUCCESS' %}bg-green-500/10 text-green-500{% else %}bg-yellow-500/10 text-yellow-500{% endif %}">
+                            {{ tx.status }}
+                        </span>
+                    </div>
                 </div>
+                {% empty %}
+                <p class="text-gray-500 text-sm italic">Belum ada transaksi.</p>
+                {% endfor %}
             </div>
+        </div>
 
-            <div class="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
-                <div class="p-6 border-b border-gray-700 flex justify-between">
-                    <h3 class="font-bold text-xl">Transaksi Terbaru</h3>
-                </div>
-                <table class="w-full text-left">
-                    <thead class="bg-gray-700 text-gray-400 text-xs uppercase">
-                        <tr><th class="p-4">Invoice</th><th class="p-4">Game</th><th class="p-4">Player ID</th><th class="p-4">Status</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        {% for t in NewTransactions %}
-                        <tr>
-                            <td class="p-4 font-mono text-blue-300">{{ t.invoice_id }}</td>
-                            <td class="p-4">{{ t.game_name }}</td>
-                            <td class="p-4">{{ t.player_id }}</td>
-                            <td class="p-4"><span class="px-3 py-1 rounded-full text-xs {% if t.status == 'SUCCESS' %}bg-green-900 text-green-300{% else %}bg-yellow-900 text-yellow-300{% endif %}">{{ t.status }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700 shadow-lg">
+            <h3 class="text-lg font-bold mb-6">Game Paling Sering Top-Up</h3>
+            <div class="h-[300px] flex items-center justify-center">
+                <canvas id="gameChart"></canvas>
             </div>
-        </main>
-    </div>
+        </div>
 
-    {% if messages %}
-    <div id="django-messages-container" class="hidden">
-        {% for message in messages %}
-            <span class="django-msg-data" data-msg="{{ message }}"></span>
-        {% endfor %}
     </div>
-    {% endif %}
+</main>
 
-    <script>
-        function confirmDelete(id, name) {
-            Swal.fire({
-                title: 'Hapus ' + name + '?',
-                text: 'Data harga di dalamnya juga bakal hilang lho!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#374151',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                background: '#1f2937', color: '#fff'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "/delete-game/" + id + "/";
-                }
-            });
+{{ chart_labels|json_script:"labels-data" }}
+{{ chart_values|json_script:"values-data" }}
+{{ game_labels|json_script:"game-labels" }}
+{{ game_counts|json_script:"game-counts" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. LINE CHART (Penjualan)
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesLabels = JSON.parse(document.getElementById('labels-data').textContent);
+    const salesValues = JSON.parse(document.getElementById('values-data').textContent);
+
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: salesLabels,
+            datasets: [{
+                label: 'Revenue',
+                data: salesValues,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
         }
+    });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            const messageElements = document.querySelectorAll('.django-msg-data');
-            messageElements.forEach(function(el) {
-                Swal.fire({
-                    title: 'Mantap!',
-                    text: el.getAttribute('data-msg'),
-                    icon: 'success',
-                    background: '#1f2937', color: '#fff',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            });
-        });
-    </script>
+    // 2. DOUGHNUT CHART (Game Populer)
+    const gameCtx = document.getElementById('gameChart').getContext('2d');
+    const gLabels = JSON.parse(document.getElementById('game-labels').textContent);
+    const gCounts = JSON.parse(document.getElementById('game-counts').textContent);
+
+    new Chart(gameCtx, {
+        type: 'doughnut',
+        data: {
+            labels: gLabels,
+            datasets: [{
+                data: gCounts,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                borderWidth: 0,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%', // Bikin lubang di tengah jadi "Donat"
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#9ca3af', padding: 20, font: { size: 10 } } }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000 // Animasi muter pas reload
+            }
+        }
+    });
+});
+</script>
 </body>
 </html>

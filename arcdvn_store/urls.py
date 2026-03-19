@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import admin_dashboard 
+from core.views import admin_dashboard, admin_manage_games, admin_transactions
 from core import views
 
 urlpatterns = [
@@ -27,6 +27,8 @@ urlpatterns = [
     path('logout/', views.logout_admin, name='logout-admin'),
     path('admin/', admin.site.urls),
     path('admin-custom/', admin_dashboard, name='admin-dashboard'),
+    path('admin-custom/games/', admin_manage_games, name='admin-games'),
+    path('admin-custom/transactions/', admin_transactions, name='admin-transactions'),
     path('delete-game/<int:game_id>/', views.delete_game, name='delete-game'),
     path('order/<slug:slug>/', views.game_detail, name='game-detail'),
     path('', admin_dashboard), 

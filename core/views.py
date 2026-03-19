@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Transaction, Game, Product
 from .forms import TransactionForm, GameForm, ProductForm
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db.models.functions import TruncDate
 import uuid
 import random
 
@@ -64,11 +65,59 @@ def api_check_payment(request, invoice_id):
 
 @login_required(login_url='login-admin')
 def admin_dashboard(request):
+    # ... (statistik total_transaksi dll tetap sama) ...
+
+    # LOGIKA GRAFIK PENJUALAN 7 HARI TERAKHIR
+    hari_ini = timezone.now().date()
+    tujuh_hari_lalu = hari_ini - timedelta(days=6)
+
+    # Ambil data transaksi sukses
+    sales_data = Transaction.objects.filter(
+        status='SUCCESS', 
+        created_at__date__range=[tujuh_hari_lalu, hari_ini] # Pakai range biar lebih akurat
+    ).annotate(date=TruncDate('created_at')) \
+     .values('date') \
+     .annotate(total=Sum('total_price')) \
+     .order_by('date')
+
+    # Mapping data biar kalau hari itu kosong, tetap muncul angka 0 (Biar grafik nggak putus)
+    sales_dict = {item['date']: float(item['total']) for item in sales_data}
+    
+    chart_labels = []
+    chart_values = []
+    
+    for i in range(7):
+        tgl = tujuh_hari_lalu + timedelta(days=i)
+        chart_labels.append(tgl.strftime('%d %b'))
+        chart_values.append(sales_dict.get(tgl, 0)) # Kalau tanggalnya nggak ada di DB, kasih 0
+
+    # LOGIKA DOUGHNUT CHART (Game Terpopuler)
+    top_games = Transaction.objects.filter(status='SUCCESS') \
+        .values('game_name') \
+        .annotate(count=Count('id')) \
+        .order_by('-count')[:5]
+    
+    game_labels = [item['game_name'] for item in top_games]
+    game_counts = [item['count'] for item in top_games]
+
+    context = {
+        'total_transaksi': Transaction.objects.count(),
+        'totalRevenue': Transaction.objects.filter(status='SUCCESS').aggregate(Sum('total_price'))['total_price__sum'] or 0,
+        'game_count': Game.objects.count(),
+        'chart_labels': chart_labels,
+        'chart_values': chart_values,
+        'game_labels': game_labels,
+        'game_counts': game_counts,
+        'recent_transactions': Transaction.objects.all().order_by('-created_at')[:3],
+    }
+    return render(request, 'admin_kece.html', context)
+
+@login_required(login_url='login-admin')
+def admin_manage_games(request):
+    # Semua urusan form Tambah Game, Harga, dan List Game pindah ke sini
     games = Game.objects.all()
     products_list = Product.objects.all()
-    transactions_list = Transaction.objects.all().order_by('-created_at')[:10]
-    now = timezone.now()
-
+    
     game_form = GameForm()
     product_form = ProductForm()
 
@@ -77,36 +126,33 @@ def admin_dashboard(request):
             game_form = GameForm(request.POST, request.FILES)
             if game_form.is_valid():
                 game_form.save()
-                return redirect('admin-dashboard')
+                return redirect('admin-games') # Balik ke halaman games
         elif 'add_product' in request.POST:
             product_form = ProductForm(request.POST)
             if product_form.is_valid():
                 product_form.save()
-                return redirect('admin-dashboard')
-
-    # Statistik untuk Dashboard
-    total_rev = Transaction.objects.filter(status='SUCCESS').aggregate(Sum('total_price'))['total_price__sum'] or 0
-    pending_count = Transaction.objects.filter(status='PENDING').count()
-    total_transaksi = Transaction.objects.count()
+                return redirect('admin-games') # Balik ke halaman games
 
     context = {
         'games': games,
         'products': products_list,
-        'NewTransactions': transactions_list,
-        'total_transaksi': total_transaksi,
-        'totalRevenue': total_rev,
-        'pendingCount': pending_count,
         'game_form': game_form,
         'product_form': product_form
     }
-    return render(request, 'admin_kece.html', context)
+    return render(request, 'admin_games.html', context)
+
+@login_required(login_url='login-admin')
+def admin_transactions(request):
+    # Khusus nampilin list transaksi
+    transactions_list = Transaction.objects.all().order_by('-created_at')
+    return render(request, 'admin_transactions.html', {'transactions': transactions_list})
 
 @login_required(login_url='login-admin')
 def delete_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     game.delete()
     messages.success(request, f'Game "{game.name}" berhasil dihapus.')
-    return redirect('admin-dashboard')
+    return redirect('admin-games') # Ubah redirect-nya ke admin-games
 
 @csrf_protect
 def login_admin(request):
