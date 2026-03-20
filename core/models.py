@@ -2,9 +2,16 @@ from django.db import models
 
 # Create your models here.
 class Game(models.Model):
+    CATEGORY_CHOICES = (
+        ('GAME', 'Top Up Game'),
+        ('PULSA', 'Pulsa & Paket Data'),
+        ('EWALLET', 'E-Wallet (Dana, OVO, dll)'),
+    )
+    
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     icon = models.ImageField(upload_to='game_icons/')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='GAME')
 
     def __str__(self):
         return self.name
@@ -17,7 +24,7 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.game.name} - {self.name}"
-
+    
 class Transaction(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Menunggu Pembayaran'),

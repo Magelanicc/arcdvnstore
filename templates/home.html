@@ -28,38 +28,83 @@
 
     <header class="container mx-auto px-6 py-16 text-center">
         <h1 class="text-5xl font-extrabold mb-4 bg-linear-to-r from-white to-slate-500 bg-clip-text text-transparent">
-            Top Up Game Favorit
+            Top Up & Tagihan Digital
         </h1>
         <p class="text-lg text-slate-400 mb-8">
-            Nikmati kemudahan top up instan untuk berbagai game populer. Pilih, bayar, dan mainkan!
+            Nikmati kemudahan transaksi instan. Game, Pulsa, hingga E-Wallet, semua ada di sini!
+        </p>
     </header>
 
-    <section class="container mx-auto px-6 pb-20">
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-        {% for game in games %}
-        <a href="{% url 'game-detail' game.slug %}" class="card-game group block bg-slate-800/40 rounded-4xl border border-slate-700/50 p-3 transition-all duration-300 hover:scale-105 hover:border-blue-500">
-            <div class="rounded-3xl overflow-hidden h-48 relative shadow-xl">
-                {% if game.icon %}
-                    <img src="{{ game.icon.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                {% else %}
-                    <div class="w-full h-full bg-slate-700 flex items-center justify-center">
-                        <i class="fas fa-image text-3xl text-slate-500"></i>
+    <div class="container mx-auto px-6 pb-20 space-y-16">
+        
+        <section>
+            <h2 class="text-2xl font-bold mb-6 flex items-center"><i class="fas fa-gamepad text-blue-500 mr-3"></i> Top Up Game</h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for item in games %}
+                <a href="{% url 'game-detail' item.slug %}" class="card-game group block bg-slate-800/40 rounded-4xl border border-slate-700/50 p-3 transition-all duration-300 hover:scale-105 hover:border-blue-500">
+                    <div class="rounded-3xl overflow-hidden h-48 relative shadow-xl">
+                        {% if item.icon %}
+                            <img src="{{ item.icon.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        {% else %}
+                            <div class="w-full h-full bg-slate-700 flex items-center justify-center">
+                                <i class="fas fa-image text-3xl text-slate-500"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
                     </div>
-                {% endif %}
-                <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
+                    <div class="p-5 text-center">
+                        <h3 class="font-bold text-xl text-white tracking-tight group-hover:text-blue-400 transition">{{ item.name }}</h3>
+                        <p class="text-[10px] text-blue-500 mt-2 font-black tracking-[0.2em] uppercase">Proses Instan</p>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="col-span-full text-slate-500 italic text-sm">Belum ada game tersedia.</p>
+                {% endfor %}
             </div>
-            <div class="p-5 text-center">
-                <h3 class="font-bold text-xl text-white tracking-tight group-hover:text-blue-400 transition">{{ game.name }}</h3>
-                <p class="text-[10px] text-blue-500 mt-2 font-black tracking-[0.2em] uppercase">Proses Instan</p>
-            </div>
-        </a>
-        {% empty %}
-        <div class="col-span-full text-center py-20 bg-slate-800/20 rounded-3xl border-2 border-dashed border-slate-700">
-            <p class="text-slate-500 italic">Belum ada game aktif. Tambahin dulu di dashboard!</p>
-        </div>
-        {% endfor %}
-    </div>
-</section>
+        </section>
 
+        <section>
+            <h2 class="text-2xl font-bold mb-6 flex items-center"><i class="fas fa-wallet text-green-500 mr-3"></i> Saldo E-Wallet</h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for item in ewallets %}
+                <a href="{% url 'game-detail' item.slug %}" class="card-game group block bg-slate-800/40 rounded-4xl border border-slate-700/50 p-3 transition-all duration-300 hover:scale-105 hover:border-green-500">
+                    <div class="rounded-3xl overflow-hidden h-48 relative shadow-xl">
+                        {% if item.icon %}
+                            <img src="{{ item.icon.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        {% endif %}
+                        <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
+                    </div>
+                    <div class="p-5 text-center">
+                        <h3 class="font-bold text-xl text-white tracking-tight group-hover:text-green-400 transition">{{ item.name }}</h3>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="col-span-full text-slate-500 italic text-sm">Belum ada e-wallet tersedia.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold mb-6 flex items-center"><i class="fas fa-mobile-alt text-yellow-500 mr-3"></i> Pulsa & Paket Data</h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for item in pulsas %}
+                <a href="{% url 'game-detail' item.slug %}" class="card-game group block bg-slate-800/40 rounded-4xl border border-slate-700/50 p-3 transition-all duration-300 hover:scale-105 hover:border-yellow-500">
+                    <div class="rounded-3xl overflow-hidden h-48 relative shadow-xl">
+                        {% if item.icon %}
+                            <img src="{{ item.icon.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        {% endif %}
+                        <div class="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
+                    </div>
+                    <div class="p-5 text-center">
+                        <h3 class="font-bold text-xl text-white tracking-tight group-hover:text-yellow-400 transition">{{ item.name }}</h3>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="col-span-full text-slate-500 italic text-sm">Belum ada pulsa tersedia.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
 </body>
 </html>

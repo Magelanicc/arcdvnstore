@@ -15,6 +15,8 @@
     </style>
 </head>
 <body class="pb-20">
+    <input type="hidden" id="item-category" value="{{ game.category }}">
+
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
         <div class="text-2xl font-extrabold tracking-tighter text-blue-500">ARCDVN<span class="text-white">STORE</span></div>
         <a href="/" class="text-gray-400 hover:text-white transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</a>
@@ -40,15 +42,15 @@
                 <div class="glass p-8 rounded-3xl">
                     <div class="flex items-center mb-6">
                         <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                        <h2 class="text-xl font-bold">Lengkapi Data Akun</h2>
+                        <h2 class="text-xl font-bold">Lengkapi Data</h2>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">User ID</label>
-                            <input type="text" name="player_id" required placeholder="Masukkan ID" 
+                            <label id="label-player-id" class="block text-sm text-gray-400 mb-2">User ID</label>
+                            <input type="text" name="player_id" id="input-player-id" required placeholder="Ketik di sini..." 
                                    class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:outline-none focus:border-blue-500 transition">
                         </div>
-                        <div>
+                        <div id="wrapper-zone-id">
                             <label class="block text-sm text-gray-400 mb-2">Zone ID (Opsional)</label>
                             <input type="text" name="zone_id" placeholder="Masukkan Server" 
                                    class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:outline-none focus:border-blue-500 transition">
@@ -59,14 +61,13 @@
                 <div class="glass p-8 rounded-3xl">
                     <div class="flex items-center mb-6">
                         <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                        <h2 class="text-xl font-bold">Pilih Nominal Top Up</h2>
+                        <h2 class="text-xl font-bold">Pilih Nominal</h2>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {% for p in products %}
                         <label class="relative group cursor-pointer">
                             <input type="radio" name="product" value="{{ p.id }}" class="card-radio hidden" required>
                             <div class="card-content border-2 border-slate-700 bg-slate-900/40 p-5 rounded-2xl transition-all hover:border-blue-500/50">
-                                <p class="text-xs text-gray-400 uppercase font-bold mb-1">{{ game.name }}</p>
                                 <p class="font-bold text-lg mb-2">{{ p.name }}</p>
                                 <p class="text-blue-400 font-extrabold text-sm">Rp {{ p.price }}</p>
                             </div>
@@ -80,7 +81,7 @@
                         <span class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
                         <h2 class="text-xl font-bold">Nomor WhatsApp</h2>
                     </div>
-                    <input type="number" name="whatsapp" required placeholder="0812xxxx" 
+                    <input type="number" name="whatsapp" required placeholder="0812xxxx (Untuk bukti pembayaran)" 
                            class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl mb-6">
                     
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/20 transform active:scale-95 transition-all">
@@ -90,5 +91,24 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const category = document.getElementById('item-category').value;
+            const labelPlayerId = document.getElementById('label-player-id');
+            const inputPlayerId = document.getElementById('input-player-id');
+            const wrapperZoneId = document.getElementById('wrapper-zone-id');
+
+            if (category === 'PULSA' || category === 'EWALLET') {
+                labelPlayerId.innerText = 'Nomor Handphone / Tujuan';
+                inputPlayerId.placeholder = 'Contoh: 081234567890';
+                wrapperZoneId.style.display = 'none'; // Sembunyikan Zone ID
+            } else {
+                labelPlayerId.innerText = 'User ID';
+                inputPlayerId.placeholder = 'Masukkan ID';
+                wrapperZoneId.style.display = 'block'; // Tampilkan Zone ID
+            }
+        });
+    </script>
 </body>
 </html>

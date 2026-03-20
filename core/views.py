@@ -16,8 +16,15 @@ import random
 # --- USER VIEWS ---
 
 def home_user(request):
-    games = Game.objects.all()
-    return render(request, 'home.html', {'games': games})
+    games = Game.objects.filter(category='GAME')
+    pulsas = Game.objects.filter(category='PULSA')
+    ewallets = Game.objects.filter(category='EWALLET')
+    
+    return render(request, 'home.html', {
+        'games': games,
+        'pulsas': pulsas,
+        'ewallets': ewallets
+    })
 
 def game_detail(request, slug):
     game = get_object_or_404(Game, slug=slug)
@@ -65,7 +72,7 @@ def api_check_payment(request, invoice_id):
 
 @login_required(login_url='login-admin')
 def admin_dashboard(request):
-    # ... (statistik total_transaksi dll tetap sama) ...
+    
 
     # LOGIKA GRAFIK PENJUALAN 7 HARI TERAKHIR
     hari_ini = timezone.now().date()
@@ -74,13 +81,13 @@ def admin_dashboard(request):
     # Ambil data transaksi sukses
     sales_data = Transaction.objects.filter(
         status='SUCCESS', 
-        created_at__date__range=[tujuh_hari_lalu, hari_ini] # Pakai range biar lebih akurat
+        created_at__date__range=[tujuh_hari_lalu, hari_ini] 
     ).annotate(date=TruncDate('created_at')) \
      .values('date') \
      .annotate(total=Sum('total_price')) \
      .order_by('date')
 
-    # Mapping data biar kalau hari itu kosong, tetap muncul angka 0 (Biar grafik nggak putus)
+    
     sales_dict = {item['date']: float(item['total']) for item in sales_data}
     
     chart_labels = []
@@ -89,7 +96,7 @@ def admin_dashboard(request):
     for i in range(7):
         tgl = tujuh_hari_lalu + timedelta(days=i)
         chart_labels.append(tgl.strftime('%d %b'))
-        chart_values.append(sales_dict.get(tgl, 0)) # Kalau tanggalnya nggak ada di DB, kasih 0
+        chart_values.append(sales_dict.get(tgl, 0)) 
 
     # LOGIKA DOUGHNUT CHART (Game Terpopuler)
     top_games = Transaction.objects.filter(status='SUCCESS') \
@@ -114,7 +121,7 @@ def admin_dashboard(request):
 
 @login_required(login_url='login-admin')
 def admin_manage_games(request):
-    # Semua urusan form Tambah Game, Harga, dan List Game pindah ke sini
+    
     games = Game.objects.all()
     products_list = Product.objects.all()
     
@@ -126,12 +133,12 @@ def admin_manage_games(request):
             game_form = GameForm(request.POST, request.FILES)
             if game_form.is_valid():
                 game_form.save()
-                return redirect('admin-games') # Balik ke halaman games
+                return redirect('admin-games') 
         elif 'add_product' in request.POST:
             product_form = ProductForm(request.POST)
             if product_form.is_valid():
                 product_form.save()
-                return redirect('admin-games') # Balik ke halaman games
+                return redirect('admin-games') 
 
     context = {
         'games': games,
@@ -143,7 +150,7 @@ def admin_manage_games(request):
 
 @login_required(login_url='login-admin')
 def admin_transactions(request):
-    # Khusus nampilin list transaksi
+    
     transactions_list = Transaction.objects.all().order_by('-created_at')
     return render(request, 'admin_transactions.html', {'transactions': transactions_list})
 
@@ -152,7 +159,7 @@ def delete_game(request, game_id):
     game = get_object_or_404(Game, id=game_id)
     game.delete()
     messages.success(request, f'Game "{game.name}" berhasil dihapus.')
-    return redirect('admin-games') # Ubah redirect-nya ke admin-games
+    return redirect('admin-games') 
 
 @csrf_protect
 def login_admin(request):

@@ -16,11 +16,12 @@ class TransactionForm(forms.ModelForm):
 class GameForm(forms.ModelForm):
     class Meta:
         model = Game
-        fields = ['name', 'slug', 'icon']
+        fields = ['name', 'slug', 'icon', 'category'] # Tambahin category
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white'}),
             'slug': forms.TextInput(attrs={'class': 'w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white'}),
             'icon': forms.FileInput(attrs={'class': 'w-full text-slate-400'}),
+            'category': forms.Select(attrs={'class': 'w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-white'}),
         }
 
 class ProductForm(forms.ModelForm):
